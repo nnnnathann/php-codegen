@@ -1,0 +1,31 @@
+{
+    "name": "oberd/php-codegen",
+    "description": "Generate client and server code based on PHP interfaces and structs",
+    "type": "library",
+    "require": {
+        "php": "^7.4",
+        "ext-json": "*",
+        "ext-curl": "*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.3",
+        "guzzlehttp/psr7": "^1.6"
+    },
+    "autoload": {
+        "psr-4": {
+            "CodeGen\\" : "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Test\\" : "tests/"
+        }
+    },
+    "license": "ISC",
+    "authors": [
+        {
+            "name": "Nathan Bleigh",
+            "email": "nathan@oberd.com"
+        }
+    ]
+}

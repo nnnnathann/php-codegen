@@ -1,0 +1,12 @@
+{
+    "name": "acme/my-api-sdk-php",
+    "require": {
+        "psr/http-message": "*",
+        "ext-curl": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Acme\\MyApi\\": "src/"
+        }
+    }
+}

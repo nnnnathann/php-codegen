@@ -1,0 +1,12 @@
+version: "3.8"
+
+services:
+  test:
+    command: bash
+    tty: true
+    build:
+      context: .
+    environment:
+      PHP_IDE_CONFIG: serverName=php-codegen
+    volumes:
+      - .:/var/www/app
