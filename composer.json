@@ -1,5 +1,5 @@
 {
-    "name": "oberd/php-codegen",
+    "name": "nnnnathann/php-codegen",
     "description": "Generate client and server code based on PHP interfaces and structs",
     "type": "library",
     "require": {
