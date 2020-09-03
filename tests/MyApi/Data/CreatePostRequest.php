@@ -8,4 +8,5 @@ final class CreatePostRequest
     public string $body;
     /** @var string[] */
     public array $tags;
+    public User $user;
 }

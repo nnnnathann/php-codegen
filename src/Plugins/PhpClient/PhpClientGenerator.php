@@ -11,6 +11,7 @@ use CodeGen\Data\Types\PrimitiveType;
 use CodeGen\Data\TypeValue;
 use CodeGen\File\PhpTemplatedDirectory;
 use CodeGen\GeneratorPluginInterface;
+use RuntimeException;
 
 final class PhpClientGenerator implements GeneratorPluginInterface
 {
@@ -65,10 +66,17 @@ final class PhpClientGenerator implements GeneratorPluginInterface
         $consArgs = [];
         $consBody = [];
         foreach ($input->properties as $propName => $type) {
-            $props[] = sprintf("    /** @var {$this->phpTypeString($type)} */\n    public \${$propName};");
-            $consDoc[] = sprintf("     * @param {$this->phpTypeString($type)} \${$propName}");
+            $typeString = $this->phpTypeString($type);
+            if ($type instanceof ObjectType) {
+                $ucPropName = ucfirst($propName);
+                $propStructClassName = "{$className}{$ucPropName}";
+                $this->writeObjectAsStruct($type, dirname($outputFile) . "/{$className}{$ucPropName}.php");
+                $typeString = $propStructClassName;
+            }
+            $props[] = sprintf("    /** @var {$typeString} */\n    public \${$propName};");
+            $consDoc[] = sprintf("     * @param {$typeString} \${$propName}");
             $consArgs[] = sprintf("\$%s", $propName);
-            $consBody[] = sprintf("        \$this->%s = \$%s;", $propName, $propName, $propName);
+            $consBody[] = sprintf("        \$this->%s = \$%s;", $propName, $propName);
         }
         $props = implode("\n", $props);
         $consDoc = "    /**\n" . implode("\n", $consDoc) . "\n     */";
@@ -112,7 +120,9 @@ STRUCT;
     {
         $dir = dirname($fileName);
         if (!file_exists($dir)) {
-            mkdir($dir, true);
+            if (!mkdir($dir, 0777, true) && !is_dir($dir)) {
+                throw new RuntimeException(sprintf('Directory "%s" was not created', $dir));
+            }
         }
         file_put_contents($fileName, $content);
     }

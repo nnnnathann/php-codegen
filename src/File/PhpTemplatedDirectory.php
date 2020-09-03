@@ -2,6 +2,8 @@
 
 namespace CodeGen\File;
 
+use RuntimeException;
+
 final class PhpTemplatedDirectory
 {
     private string $sourceDir;
@@ -34,11 +36,13 @@ final class PhpTemplatedDirectory
 
     public function captureAndWrite(array $templateData, $inputFile, string $outputFile)
     {
-        extract($templateData);
+        extract($templateData, EXTR_OVERWRITE);
         ob_start();
         include $inputFile;
         if (!file_exists(dirname($outputFile))) {
-            mkdir(dirname($outputFile), true);
+            if (!mkdir($concurrentDirectory = dirname($outputFile), 0777) && !is_dir($concurrentDirectory)) {
+                throw new RuntimeException(sprintf('Directory "%s" was not created', $concurrentDirectory));
+            }
         }
         file_put_contents($outputFile, ob_get_clean());
     }

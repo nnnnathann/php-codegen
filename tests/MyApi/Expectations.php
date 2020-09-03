@@ -32,6 +32,10 @@ final class Expectations
             'title' => new StringType(),
             'body' => new StringType(),
             'tags' => new ArrayType(new StringType()),
+            'user' => new ObjectType([
+                'id' => new StringType(),
+                'email' => new StringType()
+            ])
         ]);
     }
 

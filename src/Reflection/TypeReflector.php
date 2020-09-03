@@ -13,6 +13,7 @@ use CodeGen\Data\Types\VoidType;
 use InvalidArgumentException;
 use ReflectionClass;
 use ReflectionMethod;
+use ReflectionNamedType;
 use ReflectionParameter;
 use ReflectionProperty;
 use ReflectionType;
@@ -82,10 +83,10 @@ class TypeReflector
 
     private function propertyType(ReflectionProperty $prop)
     {
-        return $this->reflectionTypeType($prop->getType(), $prop->getDocComment() ?? null);
+        return $this->reflectionTypeType($prop->getType(), $prop->getDocComment());
     }
 
-    private function reflectionTypeType(?ReflectionType $type, ?string $docComment)
+    private function reflectionTypeType($type, ?string $docComment)
     {
         if ($type === null) {
             return new UnknownType();
@@ -94,7 +95,7 @@ class TypeReflector
             return $this->builtInType($type, $docComment);
         }
 
-        return $this->structType(new ReflectionClass((string)$type));
+        return $this->structType(new ReflectionClass($type->getName()));
     }
 
     private function builtInType(string $type, ?string $docComment)
@@ -111,7 +112,7 @@ class TypeReflector
     private function returnDocType(string $docComment)
     {
         $matches = [];
-        preg_match("/@return[\s]+([^\s]+)/", $docComment, $matches);
+        preg_match("/@return[\S]+([^\S]+)/", $docComment, $matches);
         if (count($matches) === 2) {
             return $this->stringType($matches[2]);
         }
