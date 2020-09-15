@@ -3,6 +3,7 @@
 namespace Acme\MyApi\Internal;
 
 use RuntimeException;
+use Acme\MyApi\ClientException;
 
 class ApiResponse
 {
@@ -28,8 +29,9 @@ class ApiResponse
     public function toArrayOrThrow()
     {
         if ($this->isError()) {
-            throw new MyApiClientException('error in client request', 0, $this->exception);
+            throw new ClientException('error in client request', 0, $this->exception);
         }
+        return $this->toArray();
     }
 
     public function toArray()

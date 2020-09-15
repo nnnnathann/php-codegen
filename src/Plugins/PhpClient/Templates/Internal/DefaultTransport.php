@@ -5,6 +5,7 @@ namespace <?php echo $namespace; ?>\Internal;
 
 use Exception;
 use RuntimeException;
+use <?php echo $namespace; ?>\TransportInterface;
 
 final class DefaultTransport implements TransportInterface
 {

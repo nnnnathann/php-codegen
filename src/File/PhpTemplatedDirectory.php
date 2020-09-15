@@ -2,14 +2,17 @@
 
 namespace CodeGen\File;
 
+use Exception;
 use RuntimeException;
 
 final class PhpTemplatedDirectory
 {
     private string $sourceDir;
+    private FileWriterInterface $writer;
 
-    public function __construct(string $sourceDir)
+    public function __construct(string $sourceDir, FileWriterInterface $writer=null)
     {
+        $this->writer = $writer ?? new DiskIO();
         $this->sourceDir = $sourceDir;
     }
 
@@ -36,14 +39,13 @@ final class PhpTemplatedDirectory
 
     public function captureAndWrite(array $templateData, $inputFile, string $outputFile)
     {
-        extract($templateData, EXTR_OVERWRITE);
-        ob_start();
-        include $inputFile;
-        if (!file_exists(dirname($outputFile))) {
-            if (!mkdir($concurrentDirectory = dirname($outputFile), 0777) && !is_dir($concurrentDirectory)) {
-                throw new RuntimeException(sprintf('Directory "%s" was not created', $concurrentDirectory));
-            }
+        try {
+            extract($templateData, EXTR_OVERWRITE);
+            ob_start();
+            include $inputFile;
+            $this->writer->mkdirAndWrite($outputFile, ob_get_clean());
+        } catch (Exception $exception) {
+            throw new RuntimeException('unable to write ' . $inputFile . ' to ' . $outputFile, 0, $exception);
         }
-        file_put_contents($outputFile, ob_get_clean());
     }
 }

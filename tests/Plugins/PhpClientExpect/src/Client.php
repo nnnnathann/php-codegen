@@ -9,7 +9,9 @@ use Acme\MyApi\Data\CreatePostInput;
 use Acme\MyApi\Data\CreatePostResult;
 use Acme\MyApi\Data\PublishPostInput;
 use Acme\MyApi\Data\PublishPostResult;
+use JsonException;
 use TypeError;
+use Exception;
 
 final class Client
 {
@@ -22,7 +24,7 @@ final class Client
     public function __construct(string $endpoint, $options = [])
     {
         $this->endpoint = $endpoint;
-        $this->options['transport'] = $options['transport'] ?: new DefaultTransport($options['curlopts'] ?? []);
+        $this->options['transport'] = $options['transport'] ?? new DefaultTransport($options['curlopts'] ?? []);
     }
 
     /**
@@ -32,7 +34,7 @@ final class Client
      */
     public function createPost(CreatePostInput $input) : CreatePostResult
     {
-        return $this->run($input, CreatePostResult::class);
+        return $this->run("createPost", $input, CreatePostResult::class);
     }
 
     /**
@@ -42,26 +44,22 @@ final class Client
      */
     public function publishPost(PublishPostInput $input) : PublishPostResult
     {
-        return $this->run($input, PublishPostResult::class);
+        return $this->run("publishPost", $input, PublishPostResult::class);
     }
 
-    private function run($input, $resultClass)
+    private function run($commandName, $input, $resultClass)
     {
         try {
-            $response = $this->options['transport']->sendHttpJson(new ApiRequest());
+            $request = new ApiRequest($this->endpoint, $commandName, $input);
+            $response = $this->options['transport']->sendHttpJson($request);
 
-            return $this->hydrateResult($response->toArrayOrThrow(), new $resultClass);
+            return $resultClass::fromArray($response->toArrayOrThrow());
         } catch (TypeError $error) {
             throw new ClientException('error decoding value', 500, $error);
+        } catch (JsonException $error) {
+            throw new ClientException('error encoding value', 500, $error);
+        } catch (Exception $error) {
+            throw new ClientException('unspecified client error', 500, $error);
         }
-    }
-
-    private function hydrateResult($data, $receiver)
-    {
-        foreach ($data as $key => $value) {
-            $receiver[$key] = $value;
-        }
-
-        return $receiver;
     }
 }

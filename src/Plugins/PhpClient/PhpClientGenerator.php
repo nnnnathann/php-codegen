@@ -9,17 +9,28 @@ use CodeGen\Data\Types\NumberType;
 use CodeGen\Data\Types\ObjectType;
 use CodeGen\Data\Types\PrimitiveType;
 use CodeGen\Data\TypeValue;
+use CodeGen\File\DiskIO;
+use CodeGen\File\FileIO;
+use CodeGen\File\FileWriterInterface;
 use CodeGen\File\PhpTemplatedDirectory;
 use CodeGen\GeneratorPluginInterface;
+use CodeGen\Plugins\Common\PhpDataTypes;
 use RuntimeException;
 
 final class PhpClientGenerator implements GeneratorPluginInterface
 {
     private PhpClientOptions $options;
+    private FileIO $disk;
 
-    public function __construct(PhpClientOptions $options)
+    public function __construct(PhpClientOptions $options, FileIO $io=null)
     {
         $this->options = $options;
+        $this->disk = $io ?? new DiskIO();
+    }
+
+    public function defaultDirectory(): string
+    {
+        return 'php-client';
     }
 
     public function output(string $directory, ServiceDefinition $service)
@@ -28,8 +39,10 @@ final class PhpClientGenerator implements GeneratorPluginInterface
         $templateGen->output($directory . '/src', array_merge($service->getTemplateData(), [
             'namespace' => $this->options->packageNamespace,
         ]));
-        array_walk($service->actions, fn ($action) => $this->generateDataTypes($action, $directory . '/src/Data'));
-        $this->writeFile($directory . '/composer.json', json_encode($this->composerDef($service), JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES));
+        $dataTypes = new PhpDataTypes($this->disk);
+        $outputDir = $directory . '/src/Data';
+        $dataTypes->generateActionDataTypes($service->actions, $outputDir, $this->options->packageNamespace . '\\Data');
+        $this->disk->mkdirAndWrite($directory . '/composer.json', json_encode($this->composerDef($service), JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES));
     }
 
     private function composerDef(ServiceDefinition $service)
@@ -46,84 +59,5 @@ final class PhpClientGenerator implements GeneratorPluginInterface
                 ],
             ],
         ];
-    }
-
-    private function generateDataTypes(Action $action, string $outputDirectory)
-    {
-        if ($action->input instanceof ObjectType) {
-            $this->writeObjectAsStruct($action->input, $outputDirectory . '/' . ucfirst($action->name) . 'Input.php');
-        }
-        if ($action->result instanceof ObjectType) {
-            $this->writeObjectAsStruct($action->result, $outputDirectory . '/' . ucfirst($action->name) . 'Result.php');
-        }
-    }
-
-    private function writeObjectAsStruct(ObjectType $input, string $outputFile)
-    {
-        $className = pathinfo($outputFile, PATHINFO_FILENAME);
-        $props = [];
-        $consDoc = [];
-        $consArgs = [];
-        $consBody = [];
-        foreach ($input->properties as $propName => $type) {
-            $typeString = $this->phpTypeString($type);
-            if ($type instanceof ObjectType) {
-                $ucPropName = ucfirst($propName);
-                $propStructClassName = "{$className}{$ucPropName}";
-                $this->writeObjectAsStruct($type, dirname($outputFile) . "/{$className}{$ucPropName}.php");
-                $typeString = $propStructClassName;
-            }
-            $props[] = sprintf("    /** @var {$typeString} */\n    public \${$propName};");
-            $consDoc[] = sprintf("     * @param {$typeString} \${$propName}");
-            $consArgs[] = sprintf("\$%s", $propName);
-            $consBody[] = sprintf("        \$this->%s = \$%s;", $propName, $propName);
-        }
-        $props = implode("\n", $props);
-        $consDoc = "    /**\n" . implode("\n", $consDoc) . "\n     */";
-        $consArgs = implode(", ", $consArgs);
-        $consBody = implode("\n", $consBody);
-        $structClass = <<<STRUCT
-<?php
-
-namespace {$this->options->packageNamespace}\Data;
-
-
-final class $className
-{
-$props
-
-$consDoc
-    public function __construct($consArgs)
-    {
-$consBody
-    }
-}
-STRUCT;
-        $this->writeFile($outputFile, $structClass);
-    }
-
-    private function phpTypeString(TypeValue $type)
-    {
-        if ($type instanceof ArrayType) {
-            return sprintf("%s[]", $this->phpTypeString($type->itemType));
-        }
-        if ($type instanceof NumberType) {
-            return 'int|float';
-        }
-        if ($type instanceof PrimitiveType) {
-            return $type->typeAsString;
-        }
-        return "mixed";
-    }
-
-    private function writeFile($fileName, $content)
-    {
-        $dir = dirname($fileName);
-        if (!file_exists($dir)) {
-            if (!mkdir($dir, 0777, true) && !is_dir($dir)) {
-                throw new RuntimeException(sprintf('Directory "%s" was not created', $dir));
-            }
-        }
-        file_put_contents($fileName, $content);
     }
 }

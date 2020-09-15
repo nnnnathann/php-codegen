@@ -15,4 +15,11 @@ final class CreatePostResult
     {
         $this->postId = $postId;
     }
+
+    public static function fromArray(array $data) : self
+    {
+        return new self(
+            $data['postId']
+        );
+    }
 }

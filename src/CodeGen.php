@@ -21,6 +21,9 @@ final class CodeGen
     {
         $def = $this->reflect($serviceInterfaceClass);
         foreach ($this->options->plugins as $dir => $plugin) {
+            if (is_numeric($dir)) {
+                $dir = $plugin->defaultDirectory();
+            }
             $pluginOutputDir = implode('/', [rtrim($outputDir, '/'), ltrim($dir, '/')]);
             $plugin->output($pluginOutputDir, $def);
         }
