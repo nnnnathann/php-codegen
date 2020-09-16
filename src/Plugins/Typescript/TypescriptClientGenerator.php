@@ -6,6 +6,7 @@ namespace CodeGen\Plugins\Typescript;
 
 use CodeGen\Data\Action;
 use CodeGen\Data\ServiceDefinition;
+use CodeGen\File\FileWriterInterface;
 use CodeGen\GeneratorPluginInterface;
 
 final class TypescriptClientGenerator implements GeneratorPluginInterface
@@ -48,5 +49,10 @@ class $className {
 }
 CLIENT;
         file_put_contents($directory . '/' . $this->fileName, $content);
+    }
+
+    public function defaultDirectory(): string
+    {
+        return 'ts-client';
     }
 }

@@ -9,11 +9,21 @@ final class FileSet
     /** @var string[] */
     private array $files;
     private string $baseDir;
+    /** @var FileIO */
+    private FileIO $disk;
 
-    public function __construct(array $files, string $baseDir)
+    public function __construct(array $files, string $baseDir, FileIO $disk)
     {
+        $this->disk = $disk;
         $this->files = $files;
         $this->baseDir = $baseDir;
+    }
+
+    public function write(string $relativePath, string $content)
+    {
+        $filepath = $this->join($this->baseDir, $relativePath);
+        file_put_contents($filepath, $content);
+        $this->files[] = realpath($filepath);
     }
 
     public function diff(self $fileSet, callable $contentCompare)
@@ -39,7 +49,7 @@ final class FileSet
 
     public static function fromGlob(string $pattern, string $baseDir)
     {
-        return new self(self::glob($pattern), $baseDir);
+        return new self(self::glob($pattern), $baseDir, new DiskIO());
     }
 
     private static function glob($pattern)
@@ -55,5 +65,10 @@ final class FileSet
     private function relPath(string $file)
     {
         return preg_replace('/^' . preg_quote($this->baseDir, '/') . '/', '', $file);
+    }
+
+    private function join($left, $right)
+    {
+        return rtrim($left, '/') . '/' . ltrim($right, '/');
     }
 }

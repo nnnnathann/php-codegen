@@ -10,7 +10,9 @@ use <?php echo $namespace; ?>\Internal\DefaultTransport;
 use <?php echo $namespace; ?>\Data\<?php echo ucfirst($action->name); ?>Input;
 use <?php echo $namespace; ?>\Data\<?php echo ucfirst($action->name); ?>Result;
 <?php endforeach; ?>
+use JsonException;
 use TypeError;
+use Exception;
 
 final class Client
 {
@@ -23,7 +25,7 @@ final class Client
     public function __construct(string $endpoint, $options = [])
     {
         $this->endpoint = $endpoint;
-        $this->options['transport'] = $options['transport'] ?: new DefaultTransport($options['curlopts'] ?? []);
+        $this->options['transport'] = $options['transport'] ?? new DefaultTransport($options['curlopts'] ?? []);
     }
 
 <?php foreach ($actions as $action): ?>
@@ -34,27 +36,23 @@ final class Client
      */
     public function <?php echo lcfirst($action->name); ?>(<?php echo ucfirst($action->name); ?>Input $input) : <?php echo ucfirst($action->name); ?>Result
     {
-        return $this->run($input, <?php echo ucfirst($action->name); ?>Result::class);
+        return $this->run("<?php echo lcfirst($action->name); ?>", $input, <?php echo ucfirst($action->name); ?>Result::class);
     }
 
 <?php endforeach; ?>
-    private function run($input, $resultClass)
+    private function run($commandName, $input, $resultClass)
     {
         try {
-            $response = $this->options['transport']->sendHttpJson(new ApiRequest());
+            $request = new ApiRequest($this->endpoint, $commandName, $input);
+            $response = $this->options['transport']->sendHttpJson($request);
 
-            return $this->hydrateResult($response->toArrayOrThrow(), new $resultClass);
+            return $resultClass::fromArray($response->toArrayOrThrow());
         } catch (TypeError $error) {
             throw new ClientException('error decoding value', 500, $error);
+        } catch (JsonException $error) {
+            throw new ClientException('error encoding value', 500, $error);
+        } catch (Exception $error) {
+            throw new ClientException('unspecified client error', 500, $error);
         }
-    }
-
-    private function hydrateResult($data, $receiver)
-    {
-        foreach ($data as $key => $value) {
-            $receiver[$key] = $value;
-        }
-
-        return $receiver;
     }
 }

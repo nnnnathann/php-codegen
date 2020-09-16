@@ -92,7 +92,7 @@ class TypeReflector
             return new UnknownType();
         }
         if ($type->isBuiltin()) {
-            return $this->builtInType($type, $docComment);
+            return $this->builtInType($type->getName(), $docComment);
         }
 
         return $this->structType(new ReflectionClass($type->getName()));

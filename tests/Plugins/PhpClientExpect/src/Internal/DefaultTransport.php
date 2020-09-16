@@ -4,6 +4,7 @@ namespace Acme\MyApi\Internal;
 
 use Exception;
 use RuntimeException;
+use Acme\MyApi\TransportInterface;
 
 final class DefaultTransport implements TransportInterface
 {

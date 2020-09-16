@@ -1,6 +1,6 @@
 <?php
 
-namespace Acme\MyApi\Data;
+namespace CodeGen\Laravel\Data;
 
 
 final class PublishPostInput

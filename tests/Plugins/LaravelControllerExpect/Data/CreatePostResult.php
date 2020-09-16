@@ -1,9 +1,9 @@
 <?php
 
-namespace Acme\MyApi\Data;
+namespace CodeGen\Laravel\Data;
 
 
-final class PublishPostInput
+final class CreatePostResult
 {
     /** @var string */
     public $postId;
