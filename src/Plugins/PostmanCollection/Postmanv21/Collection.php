@@ -1,12 +1,9 @@
 <?php
 
-
 namespace CodeGen\Plugins\PostmanCollection\Postmanv21;
-
 
 use CodeGen\Data\Action;
 use CodeGen\Data\ServiceDefinition;
-use CodeGen\Data\Types\ObjectType;
 use CodeGen\Data\TypeValue;
 use CodeGen\Plugins\PostmanCollection\PostmanCollectionOptions;
 use JsonSerializable;
@@ -28,7 +25,7 @@ final class Collection implements JsonSerializable
             'info' => [
                 'name' => $this->options->apiName,
                 'description' => $this->options->apiDescription,
-                "schema" => "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+                'schema' => 'https://schema.getpostman.com/json/collection/v2.1.0/collection.json',
             ],
             'item' => $this->mapActionsToItems(),
         ];
@@ -49,26 +46,26 @@ final class Collection implements JsonSerializable
                     [
                         'key' => 'Content-Type',
                         'value' => 'application/json',
-                        'type' => 'text'
-                    ]
+                        'type' => 'text',
+                    ],
                 ],
                 'body' => [
                     'mode' => 'raw',
                     'raw' => $this->generateBody($action),
                     'options' => [
                         'raw' => [
-                            'language' => 'json'
-                        ]
-                    ]
+                            'language' => 'json',
+                        ],
+                    ],
                 ],
                 'url' => [
-                    'raw' => '{{endpoint}}',
+                    'raw' => sprintf('{{%s}}', $this->options->endpointVariableName),
                     'host' => [
-                        '{{endpoint}}'
-                    ]
+                        sprintf('{{%s}}', $this->options->endpointVariableName),
+                    ],
                 ],
             ],
-            'response' => []
+            'response' => [],
         ];
     }
 

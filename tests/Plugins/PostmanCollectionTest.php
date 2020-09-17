@@ -12,7 +12,7 @@ final class PostmanCollectionTest extends AbstractPluginTestCase
     public function testCollectionGeneration()
     {
         $generator = new PostmanCollectionGenerator(
-            new PostmanCollectionOptions('MyApi', 'My Api Description')
+            new PostmanCollectionOptions('MyApi', 'My Api Description', 'endpoint')
         );
         $outputDir = $this->writeOutput($generator, __DIR__ . '/PostmanCollectionExpect');
         $expected = json_decode(file_get_contents(__DIR__ . '/PostmanCollectionExpect/MyApi.postman_collection.json'), true);
