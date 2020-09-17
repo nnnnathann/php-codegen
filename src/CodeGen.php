@@ -25,6 +25,7 @@ final class CodeGen
                 $dir = $plugin->defaultDirectory();
             }
             $pluginOutputDir = implode('/', [rtrim($outputDir, '/'), ltrim($dir, '/')]);
+            $this->options->files->mkdirp($pluginOutputDir);
             $plugin->output($pluginOutputDir, $def);
         }
     }

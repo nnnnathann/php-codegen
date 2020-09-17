@@ -26,6 +26,6 @@ final class PostmanCollectionGenerator implements GeneratorPluginInterface
     public function output(string $directory, ServiceDefinition $service)
     {
         $outputFile = $directory . '/' . $this->options->apiName . '.postman_collection.json';
-        file_put_contents($outputFile, json_encode(new Postmanv21\Collection($this->options, $service), JSON_PRETTY_PRINT));
+        file_put_contents($outputFile, json_encode(new Postmanv21\Collection($this->options, $service), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
     }
 }
