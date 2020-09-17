@@ -3,7 +3,7 @@
 namespace CodeGen\Laravel\Data;
 
 
-final class PublishPostInput
+class PublishPostInput
 {
     /** @var string */
     public $postId;

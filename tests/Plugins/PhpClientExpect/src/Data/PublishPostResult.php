@@ -3,11 +3,11 @@
 namespace Acme\MyApi\Data;
 
 
-final class PublishPostResult
+class PublishPostResult
 {
     /** @var string */
     public $postId;
-    /** @var int|float */
+    /** @var int */
     public $version;
     /** @var string */
     public $url;
@@ -16,7 +16,7 @@ final class PublishPostResult
 
     /**
      * @param string $postId
-     * @param int|float $version
+     * @param int $version
      * @param string $url
      * @param mixed $timestamp
      */

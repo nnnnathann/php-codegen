@@ -14,20 +14,24 @@ abstract class AbstractPluginTestCase extends TestCase
 
     private ServiceDefinition $definition;
 
+    /** @var string[] */
+    private $dirs;
+
     public function setUp() : void
     {
         $this->definition = (new Expectations())->getExpectedDefinition();
     }
 
+    public function tearDown() : void
+    {
+        if (!isset($_ENV['NO_CLEANUP'])) {
+            array_walk($this->dirs, [$this, 'removeDirectory']);
+        }
+    }
+
     public function validateOutput(GeneratorPluginInterface $plugin, $expectedOutputDir)
     {
-        $tmpDir = __DIR__ . '/../tmp';
-        $outputDir = implode('/', [$tmpDir, basename($expectedOutputDir)]);
-        if (file_exists($outputDir)) {
-            $this->removeDirectory($outputDir);
-        }
-        mkdir($outputDir, 0777, true);
-        $plugin->output($outputDir, $this->definition);
+        $outputDir = $this->writeOutput($plugin, $expectedOutputDir);
         $expectedOutput = FileSet::fromGlob($expectedOutputDir . '/*', $expectedOutputDir);
         $actualOutput = FileSet::fromGlob($outputDir . '/*', $outputDir);
         $expectedOutput->diff($actualOutput, function ($a, $b, $relPath) {
@@ -35,6 +39,19 @@ abstract class AbstractPluginTestCase extends TestCase
 
             return $a === $b;
         });
+    }
+
+    public function writeOutput(GeneratorPluginInterface $plugin, $expectedOutputDir)
+    {
+        $tmpDir = __DIR__ . '/../tmp';
+        $outputDir = implode('/', [$tmpDir, basename($expectedOutputDir)]);
+        if (file_exists($outputDir)) {
+            $this->removeDirectory($outputDir);
+        }
+        mkdir($outputDir, 0777, true);
+        $this->dirs[] = $outputDir;
+        $plugin->output($outputDir, $this->definition);
+        return $outputDir;
     }
 
     public function removeDirectory($path)

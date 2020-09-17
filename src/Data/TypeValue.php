@@ -10,4 +10,6 @@ abstract class TypeValue
     {
         $this->typeAsString = $typeAsString;
     }
+
+    abstract public function example();
 }

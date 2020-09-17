@@ -3,7 +3,7 @@
 namespace CodeGen\Laravel\Data;
 
 
-final class CreatePostInputUser
+class CreatePostInputUser
 {
     /** @var string */
     public $id;

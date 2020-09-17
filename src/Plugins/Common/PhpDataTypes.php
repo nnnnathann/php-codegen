@@ -6,7 +6,6 @@ namespace CodeGen\Plugins\Common;
 
 use CodeGen\Data\Action;
 use CodeGen\Data\Types\ArrayType;
-use CodeGen\Data\Types\NumberType;
 use CodeGen\Data\Types\ObjectType;
 use CodeGen\Data\Types\PrimitiveType;
 use CodeGen\Data\TypeValue;
@@ -74,7 +73,7 @@ final class PhpDataTypes
 namespace {$packageNamespace};
 
 
-final class $className
+class $className
 {
 $props
 
@@ -100,12 +99,6 @@ STRUCT;
         if ($type instanceof ArrayType) {
             return sprintf("%s[]", $this->phpTypeString($type->itemType));
         }
-        if ($type instanceof NumberType) {
-            return 'int|float';
-        }
-        if ($type instanceof PrimitiveType) {
-            return $type->typeAsString;
-        }
-        return "mixed";
+        return $type->typeAsString;
     }
 }

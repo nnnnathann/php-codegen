@@ -30,7 +30,7 @@ class ApiResponse
     public function toArrayOrThrow()
     {
         if ($this->isError()) {
-            throw new ClientException('error in client request', 0, $this->exception);
+            throw $this->exception;
         }
         return $this->toArray();
     }
@@ -41,6 +41,6 @@ class ApiResponse
             return ['error' => $this->exception->getMessage()];
         }
 
-        return json_decode($this->data);
+        return json_decode($this->data, true);
     }
 }

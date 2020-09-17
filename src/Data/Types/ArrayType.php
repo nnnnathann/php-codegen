@@ -16,4 +16,14 @@ final class ArrayType extends TypeValue
         $this->itemType = $itemType;
         parent::__construct('array');
     }
+
+    public function example()
+    {
+        $example = [];
+        $randomCount = rand(1, 4);
+        for ($i = 0; $i < $randomCount; $i++) {
+            $example[] = $this->itemType->example();
+        }
+        return $example;
+    }
 }

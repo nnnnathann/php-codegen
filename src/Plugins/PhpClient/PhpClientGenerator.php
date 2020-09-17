@@ -5,7 +5,7 @@ namespace CodeGen\Plugins\PhpClient;
 use CodeGen\Data\Action;
 use CodeGen\Data\ServiceDefinition;
 use CodeGen\Data\Types\ArrayType;
-use CodeGen\Data\Types\NumberType;
+use CodeGen\Data\Types\FloatType;
 use CodeGen\Data\Types\ObjectType;
 use CodeGen\Data\Types\PrimitiveType;
 use CodeGen\Data\TypeValue;

@@ -52,7 +52,7 @@ final class Client
         } catch (JsonException $error) {
             throw new ClientException('error encoding value', 500, $error);
         } catch (Exception $error) {
-            throw new ClientException('unspecified client error', 500, $error);
+            throw new ClientException($error->getMessage(), $error->getCode(), $error);
         }
     }
 }

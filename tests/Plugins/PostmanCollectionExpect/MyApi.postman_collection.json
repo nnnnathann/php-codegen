@@ -1,0 +1,38 @@
+{
+	"info": {
+		"name": "MyApi",
+		"description": "My Api Description",
+		"schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
+	},
+	"item": [
+		{
+			"name": "createPost",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"commandName\": \"createPost\",\n    \"inputData\": {\n        \"title\": \"Ins, Outs, What Have Yous\",\n        \"subtitle\": \"Unread for 20 years, but still here!\",\n        \"body\": \"Your post content\",\n        \"tags\": [\"testing\"],\n        \"user\": {\n            \"id\": \"10\",\n            \"email\": \"me@me.com\"\n        }\n    }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{endpoint}}",
+					"host": [
+						"{{endpoint}}"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

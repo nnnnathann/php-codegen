@@ -3,7 +3,7 @@
 namespace Acme\MyApi\Data;
 
 
-final class CreatePostResult
+class CreatePostResult
 {
     /** @var string */
     public $postId;

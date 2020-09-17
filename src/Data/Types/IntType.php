@@ -2,17 +2,15 @@
 
 namespace CodeGen\Data\Types;
 
-use CodeGen\Data\TypeValue;
-
-final class UnknownType extends TypeValue
+class IntType extends PrimitiveType
 {
     public function __construct()
     {
-        parent::__construct('mixed');
+        parent::__construct('int');
     }
 
     public function example()
     {
-        return [];
+        return rand(-1000, 1000);
     }
 }

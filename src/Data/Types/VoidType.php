@@ -10,4 +10,9 @@ final class VoidType extends TypeValue
     {
         parent::__construct('void');
     }
+
+    public function example()
+    {
+        return '';
+    }
 }

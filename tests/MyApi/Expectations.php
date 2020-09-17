@@ -5,7 +5,9 @@ namespace Test\MyApi;
 use CodeGen\Data\Action;
 use CodeGen\Data\ServiceDefinition;
 use CodeGen\Data\Types\ArrayType;
-use CodeGen\Data\Types\NumberType;
+use CodeGen\Data\Types\FloatType;
+use CodeGen\Data\Types\IntType;
+use CodeGen\Data\Types\NullableType;
 use CodeGen\Data\Types\ObjectType;
 use CodeGen\Data\Types\StringType;
 use CodeGen\Data\Types\UnknownType;
@@ -30,6 +32,7 @@ final class Expectations
     {
         return new ObjectType([
             'title' => new StringType(),
+            'subtitle' => new NullableType(new StringType()),
             'body' => new StringType(),
             'tags' => new ArrayType(new StringType()),
             'user' => new ObjectType([
@@ -62,7 +65,7 @@ final class Expectations
     {
         return new ObjectType([
             'postId' => new StringType(),
-            'version' => new NumberType(),
+            'version' => new IntType(),
             'url' => new StringType(),
             'timestamp' => new UnknownType(),
         ]);

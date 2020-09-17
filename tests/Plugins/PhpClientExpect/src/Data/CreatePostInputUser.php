@@ -3,7 +3,7 @@
 namespace Acme\MyApi\Data;
 
 
-final class CreatePostInputUser
+class CreatePostInputUser
 {
     /** @var string */
     public $id;

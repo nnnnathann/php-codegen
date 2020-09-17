@@ -3,7 +3,7 @@
 namespace CodeGen\Laravel\Data;
 
 
-final class CreatePostResult
+class CreatePostResult
 {
     /** @var string */
     public $postId;

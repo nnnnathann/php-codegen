@@ -17,4 +17,12 @@ class ObjectType extends TypeValue
         parent::__construct('object');
         $this->properties = $properties;
     }
+
+    public function example()
+    {
+        return array_reduce(array_keys($this->properties), function ($carry, $propKey) {
+            $carry[$propKey] = $this->properties[$propKey]->example();
+            return $carry;
+        }, []);
+    }
 }

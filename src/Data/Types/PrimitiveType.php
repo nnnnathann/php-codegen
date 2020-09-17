@@ -4,6 +4,6 @@ namespace CodeGen\Data\Types;
 
 use CodeGen\Data\TypeValue;
 
-class PrimitiveType extends TypeValue
+abstract class PrimitiveType extends TypeValue
 {
 }

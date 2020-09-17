@@ -3,10 +3,12 @@
 namespace CodeGen\Laravel\Data;
 
 
-final class CreatePostInput
+class CreatePostInput
 {
     /** @var string */
     public $title;
+    /** @var ?string */
+    public $subtitle;
     /** @var string */
     public $body;
     /** @var string[] */
@@ -16,13 +18,15 @@ final class CreatePostInput
 
     /**
      * @param string $title
+     * @param ?string $subtitle
      * @param string $body
      * @param string[] $tags
      * @param CreatePostInputUser $user
      */
-    public function __construct($title, $body, $tags, $user)
+    public function __construct($title, $subtitle, $body, $tags, $user)
     {
         $this->title = $title;
+        $this->subtitle = $subtitle;
         $this->body = $body;
         $this->tags = $tags;
         $this->user = $user;
@@ -32,6 +36,7 @@ final class CreatePostInput
     {
         return new self(
             $data['title'],
+            $data['subtitle'],
             $data['body'],
             $data['tags'],
             $data['user']

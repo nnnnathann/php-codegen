@@ -5,13 +5,17 @@ namespace CodeGen\Reflection;
 use CodeGen\Data\Action;
 use CodeGen\Data\ServiceDefinition;
 use CodeGen\Data\Types\ArrayType;
-use CodeGen\Data\Types\NumberType;
+use CodeGen\Data\Types\IntType;
+use CodeGen\Data\Types\FloatType;
+use CodeGen\Data\Types\NullableType;
 use CodeGen\Data\Types\ObjectType;
 use CodeGen\Data\Types\StringType;
 use CodeGen\Data\Types\UnknownType;
 use CodeGen\Data\Types\VoidType;
+use CodeGen\Data\TypeValue;
 use InvalidArgumentException;
 use ReflectionClass;
+use ReflectionException;
 use ReflectionMethod;
 use ReflectionNamedType;
 use ReflectionParameter;
@@ -86,24 +90,31 @@ class TypeReflector
         return $this->reflectionTypeType($prop->getType(), $prop->getDocComment());
     }
 
-    private function reflectionTypeType($type, ?string $docComment)
+    /**
+     * @param ReflectionType|null $type
+     * @param string|null $docComment
+     * @return TypeValue
+     * @throws ReflectionException
+     */
+    private function reflectionTypeType(?ReflectionType $type, ?string $docComment)
     {
         if ($type === null) {
             return new UnknownType();
         }
-        if ($type->isBuiltin()) {
-            return $this->builtInType($type->getName(), $docComment);
-        }
-
-        return $this->structType(new ReflectionClass($type->getName()));
+        $typeValue = $type->isBuiltin()
+            ? $this->builtInType($type->getName(), $docComment)
+            : $this->structType(new ReflectionClass($type->getName()));
+        return $type->allowsNull()
+            ? new NullableType($typeValue)
+            : $typeValue;
     }
 
     private function builtInType(string $type, ?string $docComment)
     {
         switch ($type) {
             case 'string': return new StringType();
-            case 'float':
-            case 'int': return new NumberType();
+            case 'float': return new FloatType();
+            case 'int': return new IntType();
             case 'array': return $this->docCommentType($docComment);
             default: return new UnknownType();
         }
